@@ -1,10 +1,14 @@
 [build]
-command = "./build.sh"
+command = "chmod +x build.sh && ./build.sh"
 publish = "build/web"
 
 [build.environment]
 NODE_VERSION = "18"
 FLUTTER_VERSION = "3.27.1"
+CI = "true"
+
+[build.upload]
+format = "service-worker"
 
 [build.processing]
 skip_processing = false
