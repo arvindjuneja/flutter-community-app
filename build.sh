@@ -4,15 +4,13 @@ set -ex
 echo "Setting up environment..."
 FLUTTER_VERSION=${FLUTTER_VERSION:-"3.27.1"}
 
-echo "Installing system dependencies..."
-apt-get update && apt-get install -y curl git unzip xz-utils zip libglu1-mesa
-
 echo "Downloading Flutter SDK..."
-wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz
-tar xf flutter_linux_${FLUTTER_VERSION}-stable.tar.xz
+mkdir -p $HOME/flutter
+wget -q https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz
+tar xf flutter_linux_${FLUTTER_VERSION}-stable.tar.xz -C $HOME
 
 echo "Adding Flutter to PATH..."
-export PATH="$PWD/flutter/bin:$PATH"
+export PATH="$HOME/flutter/bin:$PATH"
 
 echo "Verifying Flutter installation..."
 flutter --version
