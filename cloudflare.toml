@@ -1,0 +1,8 @@
+[build]
+command = """
+git clone https://github.com/flutter/flutter.git
+export PATH="$PATH:`pwd`/flutter/bin"
+flutter config --enable-web
+flutter build web
+"""
+publish = "build/web"
