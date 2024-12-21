@@ -4,3 +4,21 @@ publish = "build/web"
 
 [build.environment]
 NODE_VERSION = "18"
+FLUTTER_VERSION = "3.27.1"
+
+[build.processing]
+skip_processing = false
+
+[build.processing.css]
+bundle = true
+minify = true
+
+[build.processing.js]
+bundle = true
+minify = true
+
+[build.processing.html]
+pretty_urls = true
+
+[build.processing.static_files]
+chunk_size = "10mb"
