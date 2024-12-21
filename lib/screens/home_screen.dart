@@ -1,37 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../view_models/view_models.dart';
+import '../models/models.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch news when the screen loads
+    Future.microtask(() {
+      context.read<NewsViewModel>().fetchNews();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 10,
-      itemBuilder: (context, index) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: Padding(
+    return Consumer<NewsViewModel>(
+      builder: (context, newsViewModel, child) {
+        if (newsViewModel.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (newsViewModel.newsList.isEmpty) {
+          return const Center(child: Text('No news articles yet'));
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => newsViewModel.fetchNews(),
+          child: ListView.builder(
+            itemCount: newsViewModel.newsList.length,
+            itemBuilder: (context, index) {
+              final news = newsViewModel.newsList[index];
+              return NewsCard(news: news);
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class NewsCard extends StatelessWidget {
+  final News news;
+
+  const NewsCard({super.key, required this.news});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (news.imageURL != null)
+            Image.network(
+              news.imageURL!,
+              width: double.infinity,
+              height: 200,
+              fit: BoxFit.cover,
+            ),
+          Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'News Title $index',
+                  news.title,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
-                  'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                  news.content,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 16,
-                      child: Icon(Icons.person),
+                      child: Text(news.authorName[0]),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -39,11 +95,11 @@ class HomeScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Author Name',
-                            style: Theme.of(context).textTheme.titleSmall,
+                            news.authorName,
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           Text(
-                            '2 hours ago',
+                            _formatDate(news.publishedAt),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -51,19 +107,35 @@ class HomeScreen extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.comment_outlined),
-                      onPressed: () {},
+                      onPressed: () {
+                        // TODO: Open comments
+                      },
                     ),
-                    Text(
-                      '12',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
+                    Text(news.commentsCount.toString()),
                   ],
                 ),
               ],
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays > 7) {
+      return '${date.day}/${date.month}/${date.year}';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Just now';
+    }
   }
 }
