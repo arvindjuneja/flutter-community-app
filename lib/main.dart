@@ -1,8 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';
 import 'firebase_options.dart';
+import 'services/services.dart';
+import 'view_models/view_models.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,11 +27,81 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Community App',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      home: const MainScreen(),
+    return MultiProvider(
+      providers: [
+        // Services
+        Provider(
+          create: (_) => FirebaseService(),
+        ),
+        Provider(
+          create: (context) => AuthService(
+            firestore: context.read<FirebaseService>().firestore,
+            auth: context.read<FirebaseService>().auth,
+            storage: context.read<FirebaseService>().storage,
+          ),
+        ),
+        Provider(
+          create: (context) => NewsService(
+            firestore: context.read<FirebaseService>().firestore,
+            auth: context.read<FirebaseService>().auth,
+            storage: context.read<FirebaseService>().storage,
+          ),
+        ),
+        Provider(
+          create: (context) => HydeParkService(
+            firestore: context.read<FirebaseService>().firestore,
+            auth: context.read<FirebaseService>().auth,
+            storage: context.read<FirebaseService>().storage,
+          ),
+        ),
+        Provider(
+          create: (context) => BusinessService(
+            firestore: context.read<FirebaseService>().firestore,
+            auth: context.read<FirebaseService>().auth,
+            storage: context.read<FirebaseService>().storage,
+          ),
+        ),
+        Provider(
+          create: (context) => CommentService(
+            firestore: context.read<FirebaseService>().firestore,
+            auth: context.read<FirebaseService>().auth,
+            storage: context.read<FirebaseService>().storage,
+          ),
+        ),
+        
+        // View Models
+        ChangeNotifierProvider(
+          create: (context) => UserViewModel(
+            context.read<AuthService>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => NewsViewModel(
+            context.read<NewsService>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => HydeParkViewModel(
+            context.read<HydeParkService>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => BusinessViewModel(
+            context.read<BusinessService>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CommentViewModel(
+            context.read<CommentService>(),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Community App',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        home: const MainScreen(),
+      ),
     );
   }
 }
