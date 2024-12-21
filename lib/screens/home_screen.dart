@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart'
+import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -22,4 +22,48 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. 'n
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
+                  'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 16,
+                      child: Icon(Icons.person),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Author Name',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                          Text(
+                            '2 hours ago',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.comment_outlined),
+                      onPressed: () {},
+                    ),
+                    Text(
+                      '12',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
